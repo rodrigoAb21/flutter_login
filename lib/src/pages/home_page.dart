@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../utils/preferences.dart';
+import '../../widgets/side_menu.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,10 +13,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Home'),
+        ),
+        drawer: const SideMenu(),
         backgroundColor: Colors.white,
-        body: Center(
-          child: Text('Home Page'),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Nombre: ${Preferences.nombre}'),
+            const Divider(),
+            Text('Email: ${Preferences.email}'),
+            const Divider(),
+            Text('Token: ${Preferences.token}'),
+            const Divider(),
+          ],
         ));
   }
 }

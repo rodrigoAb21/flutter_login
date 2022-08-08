@@ -1,7 +1,6 @@
-// ignore_for_file: unused_field
-
 import 'package:flutter_login/src/pages/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login/src/utils/preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -79,6 +78,9 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   debugPrint('EMAIL: ${emailController.text}');
                   debugPrint('PASSWORD: ${passwordController.text}');
+                  Preferences.email = emailController.text;
+                  Preferences.nombre = passwordController.text;
+                  Preferences.token = 'ojwpaerdp23oa23skndpas34ok';
                   Navigator.pushReplacementNamed(context, HomePage.routeName);
                 },
                 child: const Text(
