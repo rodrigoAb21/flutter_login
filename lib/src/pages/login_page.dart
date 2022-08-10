@@ -1,5 +1,7 @@
 import 'package:flutter_login/src/pages/home_page.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
 import 'package:flutter_login/src/utils/preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -76,12 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.blue, borderRadius: BorderRadius.circular(10)),
               child: TextButton(
                 onPressed: () {
-                  debugPrint('EMAIL: ${emailController.text}');
-                  debugPrint('PASSWORD: ${passwordController.text}');
-                  Preferences.email = emailController.text;
-                  Preferences.nombre = passwordController.text;
-                  Preferences.token = 'ojwpaerdp23oa23skndpas34ok';
-                  Navigator.pushReplacementNamed(context, HomePage.routeName);
+                  _enviar();
                 },
                 child: const Text(
                   'Login',
@@ -96,5 +93,44 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  _enviar() async {
+    final datos = {
+      'email': emailController.text,
+      'password': passwordController.text,
+      'device_name': 'flutter App'
+    };
+
+    final resp = await http.post(Uri.http('192.168.1.163:8000', '/api/login'),
+        body: datos,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded"
+        });
+
+    var decodedResp = convert.jsonDecode(resp.body);
+    //debugPrint(decodedResp);
+
+    if (decodedResp.containsKey('access_token')) {
+      Preferences.token = 'Bearer ${decodedResp['access_token']}';
+
+      final r2 = await http.get(Uri.http('192.168.1.163:8000', '/api/user'),
+          headers: {
+            "Accept": "application/json",
+            "Authorization": Preferences.token
+          });
+      if (r2.statusCode == 200) {
+        debugPrint("entra a if 200");
+        var decodedResp = convert.jsonDecode(r2.body);
+        Preferences.email = decodedResp['email'];
+        Preferences.nombre = decodedResp['nombre'];
+        debugPrint("entra a if 200    2");
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, HomePage.routeName);
+      } else {
+        debugPrint('ERRRRROR!');
+      }
+    }
   }
 }
